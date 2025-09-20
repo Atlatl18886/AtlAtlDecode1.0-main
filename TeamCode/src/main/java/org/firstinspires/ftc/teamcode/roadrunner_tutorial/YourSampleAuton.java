@@ -11,7 +11,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner_tutorial.base_subsystem_templates.*;
+import org.firstinspires.ftc.teamcode.roadrunner_tutorial.base_subsystem_templates.Motor_Template;
+import org.firstinspires.ftc.teamcode.roadrunner_tutorial.base_subsystem_templates.RunIntake_Template;
+import org.firstinspires.ftc.teamcode.roadrunner_tutorial.base_subsystem_templates.Servo_Template;
 
 @Config
 @Autonomous(name = "Your Own Autonomous!")
