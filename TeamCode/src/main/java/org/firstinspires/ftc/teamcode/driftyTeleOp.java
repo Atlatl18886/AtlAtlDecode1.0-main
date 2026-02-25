@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.TeleOpConfig;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,11 +11,11 @@ public class driftyTeleOp extends OpMode {
     private DcMotorEx lb1, lb2;
     private DcMotorEx rb1, rb2;
     private Servo steer;
-    private enum Mode {LINEAR, QUINTIC, BEZIER, SIGMOID, SMOOTH};
-    private Mode ymode = Mode.BEZIER;
-    private Mode rxMode = Mode.QUINTIC;
-    private SlewRateLimiter leftSlew = new SlewRateLimiter(2.0, 6.0);
-    private SlewRateLimiter rightSlew = new SlewRateLimiter(2.0, 6.0);
+    public enum Mode {LINEAR, QUINTIC, BEZIER, SIGMOID, SMOOTH};
+    private Mode ymode = TeleOpConfig.ymode;
+    private Mode rxMode = TeleOpConfig.rxMode;
+    private SlewRateLimiter leftSlew = new SlewRateLimiter(TeleOpConfig.SlEW_A, TeleOpConfig.SlEW_D);
+    private SlewRateLimiter rightSlew = new SlewRateLimiter(TeleOpConfig.SlEW_A, TeleOpConfig.SlEW_D);
 
     @Override
     public void init() {
@@ -26,10 +25,10 @@ public class driftyTeleOp extends OpMode {
         rb2 = hardwareMap.get(DcMotorEx.class, "rb2");
         steer = hardwareMap.get(Servo.class, "turn");
 
-        lb1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        lb2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        rb1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        rb2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        lb1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE); //FLOAT --weird with slewratelimiter
+        lb2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE); //FLOAT
+        rb1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE); //FLOAT
+        rb2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE); //FLOAT
 
         lb1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         lb2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -97,14 +96,14 @@ public class driftyTeleOp extends OpMode {
     }
 
     public class SlewRateLimiter {
-        private double accelLimit;
-        private double decelLimit;
+        private double a; //accelLimit
+        private double d; //decelLimit
         private double lastOutput = 0;
         private ElapsedTime timer;
 
-        public SlewRateLimiter(double accelLimit, double decelLimit) {
-            this.accelLimit = accelLimit;
-            this.decelLimit = decelLimit;
+        public SlewRateLimiter(double a, double d) {
+            this.a = a;
+            this.d = d;
             this.timer = new ElapsedTime();
             this.timer.reset();
         }
@@ -116,9 +115,9 @@ public class driftyTeleOp extends OpMode {
             double step;
             //check if (decel OR change dir)
             if (Math.abs(target) < Math.abs(lastOutput) || Math.signum(target) != Math.signum(lastOutput)) {
-                step = decelLimit * dt;
+                step = d * dt;
             } else {
-                step = accelLimit * dt;
+                step = a * dt;
             }
 
             double error = target - lastOutput;
